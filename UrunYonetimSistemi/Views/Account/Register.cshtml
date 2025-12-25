@@ -1,0 +1,70 @@
+@model UrunYonetimSistemi.Models.ViewModels.RegisterViewModel
+
+@{
+    ViewData["Title"] = "Kayıt Ol";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card glass text-white mt-5">
+            <div class="card-header bg-transparent border-bottom border-light text-center py-4">
+                <i class="bi bi-person-plus-fill display-4"></i>
+                <h3 class="mt-2 text-readable">Kayıt Ol</h3>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Register">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="form-floating">
+                                <input asp-for="FirstName" class="form-control" placeholder="İsim" />
+                                <label asp-for="FirstName" class="text-dark">İsim</label>
+                                <span asp-validation-for="FirstName" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-floating">
+                                <input asp-for="LastName" class="form-control" placeholder="Soyisim" />
+                                <label asp-for="LastName" class="text-dark">Soyisim</label>
+                                <span asp-validation-for="LastName" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="Email" class="form-control" placeholder="name@example.com" />
+                        <label asp-for="Email" class="text-dark">Email Adresi</label>
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="Password" class="form-control" placeholder="Şifre" />
+                        <label asp-for="Password" class="text-dark">Şifre</label>
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                        <small class="text-readable-muted">En az 3 karakter.</small>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="ConfirmPassword" class="form-control" placeholder="Şifre Tekrar" />
+                        <label asp-for="ConfirmPassword" class="text-dark">Şifre Tekrar</label>
+                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-success btn-lg shadow-lg">
+                            Kayıt Ol
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer bg-transparent border-top border-light text-center py-3">
+                <p class="mb-0 text-readable-muted">Zaten hesabınız var mı? <a asp-action="Login" class="text-warning fw-bold">Giriş Yap</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,12 @@
+@model IEnumerable<UrunYonetimSistemi.Models.Category>
+
+<ul class="dropdown-menu border-0 shadow-lg animated-dropdown">
+    @foreach (var category in Model)
+    {
+        <li><a class="dropdown-item" asp-controller="Products" asp-action="Index" asp-route-category="@category.Id">@category.Name</a></li>
+    }
+    @if (!Model.Any())
+    {
+        <li><span class="dropdown-item text-muted small">Kategori Yok</span></li>
+    }
+</ul>

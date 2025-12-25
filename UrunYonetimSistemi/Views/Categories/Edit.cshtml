@@ -1,0 +1,44 @@
+@model UrunYonetimSistemi.Models.Category
+
+@{
+    ViewData["Title"] = "Kategori Düzenle";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-lg mt-4 glass">
+            <div class="card-header py-3">
+                <h4 class="card-title mb-0 text-warning">
+                    <i class="bi bi-pencil-square me-2"></i>Kategori Düzenle
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Edit">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="Id" />
+                    
+                    <div class="form-floating mb-3">
+                        <input asp-for="Name" class="form-control" placeholder="Kategori Adı" />
+                        <label asp-for="Name"></label>
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <textarea asp-for="Description" class="form-control" placeholder="Açıklama" style="height: 100px"></textarea>
+                        <label asp-for="Description">Açıklama</label>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-warning btn-lg text-white">Güncelle</button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">Listeye Dön</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

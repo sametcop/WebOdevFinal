@@ -1,0 +1,87 @@
+@model UrunYonetimSistemi.Models.Product
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-lg mt-4 glass">
+            <div class="card-header py-3">
+                <h4 class="card-title mb-0 text-primary">
+                    <i class="bi bi-plus-circle me-2"></i>Yeni Ürün Ekle
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Create" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    
+                    <div class="form-floating mb-3">
+                        <input asp-for="Name" class="form-control" placeholder="Ürün Adı" />
+                        <label asp-for="Name">Ürün Adı</label>
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="ImageUrl" class="form-label">Ürün Görseli</label>
+                        <input type="file" name="image" class="form-control" accept="image/*" />
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <select asp-for="CategoryId" class ="form-control" asp-items="ViewBag.CategoryId">
+                            <option value="">Kategori Seçiniz</option>
+                        </select>
+                        <label asp-for="CategoryId">Kategori</label>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Stock" class="form-control" placeholder="Stok" />
+                                <label asp-for="Stock">Stok Adedi</label>
+                                <span asp-validation-for="Stock" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3">
+                                <input asp-for="OldPrice" class="form-control" placeholder="Eski Fiyat" />
+                                <label asp-for="OldPrice">Eski Fiyat (İndirimsiz)</label>
+                                <span asp-validation-for="OldPrice" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Price" class="form-control" placeholder="Fiyat" />
+                                <label asp-for="Price">Net Fiyat</label>
+                                <span asp-validation-for="Price" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <textarea asp-for="Description" class="form-control" placeholder="Açıklama" style="height: 100px"></textarea>
+                        <label asp-for="Description">Açıklama</label>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-floating mb-4">
+                        <input asp-for="CreatedDate" class="form-control" placeholder="Tarih" />
+                        <label asp-for="CreatedDate">Eklenme Tarihi</label>
+                        <span asp-validation-for="CreatedDate" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a asp-action="Index" class="btn btn-outline-secondary me-md-2">Vazgeç</a>
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="bi bi-check-lg me-1"></i>Kaydet
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

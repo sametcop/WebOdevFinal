@@ -1,0 +1,117 @@
+@model IEnumerable<UrunYonetimSistemi.Models.Product>
+
+@{
+    ViewData["Title"] = "Arama Sonuçları";
+    string query = ViewBag.SearchQuery as string ?? "";
+}
+
+<div class="container py-4">
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-8">
+            <h2 class="mb-0">"Category" için Arama Sonuçları</h2>
+            <p class="text-muted">@Model.Count() ürün bulundu.</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <form asp-action="Search" method="get" class="d-inline-flex">
+                <input type="hidden" name="q" value="@ViewBag.SearchQuery" />
+                <select name="sortOrder" class="form-select" onchange="this.form.submit()">
+                    <option value="" selected="@(ViewBag.CurrentSort == null)">En Yeniler</option>
+                    <option value="price_asc" selected="@(ViewBag.CurrentSort == "price_asc")">Fiyat Artan</option>
+                    <option value="price_desc" selected="@(ViewBag.CurrentSort == "price_desc")">Fiyat Azalan</option>
+                </select>
+            </form>
+        </div>
+    </div>
+    @if (!Model.Any())
+    {
+        <div class="alert glass text-center py-5">
+            <i class="bi bi-search display-1 text-muted mb-3"></i>
+            <h3 class="text-white">Üzgünüz, aradığınız kriterlere uygun ürün bulunamadı.</h3>
+            <p class="text-muted">Lütfen farklı anahtar kelimelerle tekrar deneyin veya kategorilerimize göz atın.</p>
+            <a asp-action="Index" class="btn btn-outline-light mt-3">Ana Sayfaya Dön</a>
+        </div>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-4 g-4">
+            @foreach (var item in Model)
+            {
+                <div class="col">
+                    <div class="card h-100 border-0 shadow-sm product-card glass">
+                        <div class="position-relative overflow-hidden">
+                            @if (item.OldPrice.HasValue && item.OldPrice > item.Price)
+                            {
+                                <span class="position-absolute top-0 start-0 bg-danger text-white badge m-2 shadow-sm rounded-pill px-2 py-1">
+                                    % @(Math.Round(100 - (item.Price / item.OldPrice.Value * 100))) İndirim
+                                </span>
+                            }
+
+                            @if (item.Stock <= 0)
+                            {
+                                <span class="position-absolute top-0 end-0 bg-secondary text-white badge m-2 shadow-sm">Tükendi</span>
+                            }
+
+                            @if (!string.IsNullOrEmpty(item.ImageUrl))
+                            {
+                                <img src="@item.ImageUrl" class="card-img-top @(item.Stock <= 0 ? "grayscale" : "")" alt="@item.Name" style="height: 250px; object-fit: cover;">
+                            }
+                            else
+                            {
+                                 <div class="d-flex align-items-center justify-content-center bg-dark @(item.Stock <= 0 ? "grayscale" : "")" style="height: 250px;">
+                                    <i class="bi bi-image text-muted display-4"></i>
+                                </div>
+                            }
+                            
+                            <div class="product-overlay d-flex align-items-center justify-content-center">
+                                <a asp-controller="Products" asp-action="Details" asp-route-id="@item.Id" class="btn btn-light rounded-circle mx-1 shadow-sm" title="İncele"><i class="bi bi-eye"></i></a>
+                                @if (item.Stock > 0)
+                                {
+                                    <a asp-controller="Cart" asp-action="AddToCart" asp-route-id="@item.Id" class="btn btn-warning rounded-circle mx-1 shadow-sm text-white" title="Sepete Ekle"><i class="bi bi-cart-plus"></i></a>
+                                }
+                            </div>
+                        </div>
+                        <div class="card-body text-center">
+                            <h5 class="card-title fw-bold text-white">@item.Name</h5>
+                            <div class="d-flex justify-content-center align-items-center gap-2">
+                                 @if (item.OldPrice.HasValue && item.OldPrice > item.Price)
+                                 {
+                                     <span class="text-readable-muted text-decoration-line-through small">@item.OldPrice ₺</span>
+                                     <span class="card-text text-danger fw-bold fs-5">@item.Price ₺</span>
+                                 }
+                                 else
+                                 {
+                                     <span class="card-text text-success fw-bold fs-5">@item.Price ₺</span>
+                                 }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<style>
+    .product-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .product-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 1rem 3rem rgba(0,0,0,.3) !important;
+        border-color: rgba(99, 102, 241, 0.5) !important;
+    }
+    .product-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        backdrop-filter: blur(2px);
+    }
+    .product-card:hover .product-overlay {
+        opacity: 1;
+    }
+</style>

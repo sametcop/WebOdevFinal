@@ -1,0 +1,38 @@
+@model AppUser
+
+@{
+    ViewData["Title"] = "Profilim";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card glass text-white">
+            <div class="card-body p-5">
+                <div class="text-center mb-4">
+                    <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3 shadow-lg" style="width: 100px; height: 100px;">
+                        <span class="display-3 fw-bold">@Model.FirstName.Substring(0,1)</span>
+                    </div>
+                    <h2 class="fw-bold text-readable">@Model.FirstName @Model.LastName</h2>
+                    <p class="text-readable-muted">@Model.Email</p>
+                    <span class="badge bg-success">Üye</span>
+                </div>
+
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success bg-opacity-25 text-white border-0">
+                        @TempData["SuccessMessage"]
+                    </div>
+                }
+
+                <div class="d-grid gap-2 mt-4">
+                    <a asp-action="ChangePassword" class="btn btn-outline-light py-2">
+                        <i class="bi bi-key me-2"></i> Şifre Değiştir
+                    </a>
+                    <a asp-controller="Cart" asp-action="Index" class="btn btn-outline-warning py-2">
+                         <i class="bi bi-cart3 me-2"></i> Sepetim
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

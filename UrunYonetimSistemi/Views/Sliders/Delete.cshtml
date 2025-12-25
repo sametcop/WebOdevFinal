@@ -1,0 +1,45 @@
+@model UrunYonetimSistemi.Models.SliderItem
+
+@{
+    ViewData["Title"] = "Slayt Sil";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-lg mt-4 glass border-danger">
+            <div class="card-header py-3">
+                <h4 class="card-title mb-0 text-danger">
+                    <i class="bi bi-trash me-2"></i>Slayt Silinecek
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                <h5 class="mb-4">Bu slaytı silmek istediğinize emin misiniz?</h5>
+                
+                <dl class="row">
+                    <dt class="col-sm-4">@Html.DisplayNameFor(model => model.Title)</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.Title)</dd>
+                    
+                    <dt class="col-sm-4">@Html.DisplayNameFor(model => model.Description)</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.Description)</dd>
+                </dl>
+                
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <div class="mb-3 text-center">
+                        <img src="@Model.ImageUrl" alt="Silinecek Resim" style="max-height: 150px; border-radius: 8px;" />
+                    </div>
+                }
+
+                <form asp-action="Delete">
+                    <input type="hidden" asp-for="Id" />
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a asp-action="Index" class="btn btn-outline-secondary me-md-2">Vazgeç</a>
+                        <button type="submit" class="btn btn-danger px-4">
+                            <i class="bi bi-trash-fill me-1"></i>Evet, Sil
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

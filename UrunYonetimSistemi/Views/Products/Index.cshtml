@@ -1,0 +1,114 @@
+@model IEnumerable<UrunYonetimSistemi.Models.Product>
+
+@{
+    ViewData["Title"] = "Ürünler";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="display-6 fw-bold">Ürün Listesi</h1>
+    @if (User.IsInRole("Admin"))
+    {
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> Yeni Ürün Ekle
+        </a>
+    }
+</div>
+
+<div class="row row-cols-1 row-cols-md-4 g-4">
+    @foreach (var item in Model)
+    {
+        <div class="col">
+            <div class="card h-100 border-0 shadow-sm product-card">
+                <div class="position-relative overflow-hidden">
+                    @if (item.OldPrice.HasValue && item.OldPrice > item.Price)
+                    {
+                        <span class="position-absolute top-0 start-0 bg-danger text-white badge m-2 shadow-sm rounded-pill px-2 py-1">
+                            % @(Math.Round(100 - (item.Price / item.OldPrice.Value * 100))) İndirim
+                        </span>
+                    }
+
+                    @if (item.Stock <= 0)
+                    {
+                        <span class="position-absolute top-0 end-0 bg-secondary text-white badge m-2 shadow-sm">Tükendi</span>
+                    }
+
+                    @if (!string.IsNullOrEmpty(item.ImageUrl))
+                    {
+                        <img src="@item.ImageUrl" class="card-img-top @(item.Stock <= 0 ? "grayscale" : "")" alt="@item.Name" style="height: 250px; object-fit: cover;">
+                    }
+                    else
+                    {
+                         <div class="d-flex align-items-center justify-content-center bg-light @(item.Stock <= 0 ? "grayscale" : "")" style="height: 250px;">
+                            <i class="bi bi-image text-muted display-4"></i>
+                        </div>
+                    }
+                    
+                    <div class="product-overlay d-flex flex-column align-items-center justify-content-center p-3 text-center">
+                         @if (User.IsInRole("Admin"))
+                        {
+                            <div class="d-flex mb-2">
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning rounded-circle mx-1 shadow-sm" title="Düzenle"><i class="bi bi-pencil"></i></a>
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger rounded-circle mx-1 shadow-sm" title="Sil"><i class="bi bi-trash"></i></a>
+                            </div>
+                        }
+                        
+                        <div class="d-flex">
+                             <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-light rounded-circle mx-1 shadow-sm" title="İncele"><i class="bi bi-eye"></i></a>
+                            @if (!User.IsInRole("Admin") && item.Stock > 0)
+                            {
+                                 <a asp-controller="Cart" asp-action="AddToCart" asp-route-id="@item.Id" class="btn btn-warning rounded-circle mx-1 shadow-sm text-white" title="Sepete Ekle"><i class="bi bi-cart-plus"></i></a>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body text-center">
+                    <h5 class="card-title fw-bold">@item.Name</h5>
+                    
+                    @if(item.Category != null)
+                    {
+                        <span class="badge bg-info text-dark mb-2">@item.Category.Name</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary text-light border-0 mb-2">Kategorisiz</span>
+                    }
+
+                    <div class="d-flex justify-content-center align-items-center gap-2">
+                         @if (item.OldPrice.HasValue && item.OldPrice > item.Price)
+                         {
+                             <span class="text-muted text-decoration-line-through small">@item.OldPrice ₺</span>
+                             <span class="card-text text-danger fw-bold fs-5">@item.Price ₺</span>
+                         }
+                         else
+                         {
+                             <span class="card-text text-success fw-bold fs-5">@item.Price ₺</span>
+                         }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .product-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .product-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 1rem 3rem rgba(0,0,0,.15)!important;
+    }
+    .product-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.6);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    .product-card:hover .product-overlay {
+        opacity: 1;
+    }
+</style>

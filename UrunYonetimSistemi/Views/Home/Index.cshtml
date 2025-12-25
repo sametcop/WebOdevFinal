@@ -1,0 +1,142 @@
+﻿@model UrunYonetimSistemi.ViewModels.HomeViewModel
+
+@{
+    ViewData["Title"] = "Ana Sayfa";
+}
+
+<!-- Hero Slider Section -->
+@if (Model.Sliders.Any())
+{
+    <div id="mainCarousel" class="carousel slide mb-5 shadow-lg rounded-3 overflow-hidden glass" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            @for (int i = 0; i < Model.Sliders.Count(); i++)
+            {
+                <button type="button" data-bs-target="#mainCarousel" data-bs-slide-to="@i" class="@(i == 0 ? "active" : "")" aria-current="true" aria-label="Slide @(i+1)"></button>
+            }
+        </div>
+        <div class="carousel-inner">
+            @for (int i = 0; i < Model.Sliders.Count(); i++)
+            {
+                var item = Model.Sliders.ElementAt(i);
+                <div class="carousel-item @(i == 0 ? "active" : "")" data-bs-interval="5000">
+                    <img src="@item.ImageUrl" class="d-block w-100" alt="@item.Title" style="height: 500px; object-fit: cover; opacity: 0.8;">
+                    <div class="carousel-caption d-none d-md-block glass p-3 rounded-3 mb-4">
+                        <h2 class="display-5 fw-bold text-white text-shadow">@item.Title</h2>
+                        @if (!string.IsNullOrEmpty(item.Description))
+                        {
+                            <p class="fs-5 text-light">@item.Description</p>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#mainCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Önceki</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#mainCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Sonraki</span>
+        </button>
+    </div>
+}
+else
+{
+    <!-- Fallback Static Hero if no sliders -->
+    <div class="p-5 mb-5 rounded-3 text-center shadow-lg glass" style="border: 1px solid rgba(255,255,255,0.1);">
+        <div class="container-fluid py-5">
+            <h1 class="display-4 fw-bold text-white mb-3">Son Teknoloji Ürünler</h1>
+            <p class="col-md-8 fs-4 mx-auto text-light opacity-75">
+                En güncel bilgisayar ekipmanları şimdi mağazamızda
+            </p>
+            <a href="#products" class="btn btn-primary btn-lg px-5 py-3 mt-3 shadow-lg rounded-pill fw-bold">Ürünleri Keşfet</a>
+        </div>
+    </div>
+}
+
+<!-- Products Section -->
+<div id="products" class="container">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <h2 class="display-6 fw-bold border-start border-5 border-primary ps-3">Popüler Ürünler</h2>
+        <a asp-controller="Products" asp-action="Index" class="btn btn-outline-dark rounded-pill px-4">Tümünü Gör <i class="bi bi-arrow-right"></i></a>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-4 g-4">
+        @foreach (var item in Model.Products)
+        {
+            <div class="col">
+                <div class="card h-100 border-0 shadow-sm product-card">
+                    <div class="position-relative overflow-hidden">
+                        @if (item.OldPrice.HasValue && item.OldPrice > item.Price)
+                        {
+                            <span class="position-absolute top-0 start-0 bg-danger text-white badge m-2 shadow-sm rounded-pill px-2 py-1">
+                                % @(Math.Round(100 - (item.Price / item.OldPrice.Value * 100))) İndirim
+                            </span>
+                        }
+                        
+                        @if (item.Stock <= 0)
+                        {
+                            <span class="position-absolute top-0 end-0 bg-secondary text-white badge m-2 shadow-sm">Tükendi</span>
+                        }
+
+                        @if (!string.IsNullOrEmpty(item.ImageUrl))
+                        {
+                            <img src="@item.ImageUrl" class="card-img-top @(item.Stock <= 0 ? "grayscale" : "")" alt="@item.Name" style="height: 250px; object-fit: cover;">
+                        }
+                        else
+                        {
+                             <div class="d-flex align-items-center justify-content-center bg-light @(item.Stock <= 0 ? "grayscale" : "")" style="height: 250px;">
+                                <i class="bi bi-image text-muted display-4"></i>
+                            </div>
+                        }
+                        
+                        <div class="product-overlay d-flex align-items-center justify-content-center">
+                            <a asp-controller="Products" asp-action="Details" asp-route-id="@item.Id" class="btn btn-light rounded-circle mx-1 shadow-sm" title="İncele"><i class="bi bi-eye"></i></a>
+                            @if (item.Stock > 0)
+                            {
+                                <a asp-controller="Cart" asp-action="AddToCart" asp-route-id="@item.Id" class="btn btn-warning rounded-circle mx-1 shadow-sm text-white" title="Sepete Ekle"><i class="bi bi-cart-plus"></i></a>
+                            }
+                        </div>
+                    </div>
+                    <div class="card-body text-center">
+                        <h5 class="card-title fw-bold">@item.Name</h5>
+                        <div class="d-flex justify-content-center align-items-center gap-2">
+                             @if (item.OldPrice.HasValue && item.OldPrice > item.Price)
+                             {
+                                 <span class="text-muted text-decoration-line-through small">@item.OldPrice ₺</span>
+                                 <span class="card-text text-danger fw-bold fs-5">@item.Price ₺</span>
+                             }
+                             else
+                             {
+                                 <span class="card-text text-success fw-bold fs-5">@item.Price ₺</span>
+                             }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .product-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .product-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 1rem 3rem rgba(0,0,0,.15)!important;
+    }
+    .product-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.3);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    .product-card:hover .product-overlay {
+        opacity: 1;
+    }
+</style>

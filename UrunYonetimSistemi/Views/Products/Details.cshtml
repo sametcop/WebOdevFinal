@@ -1,0 +1,127 @@
+@model UrunYonetimSistemi.Models.Product
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm mt-4">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h4 class="card-title mb-0 text-info">
+                    <i class="bi bi-info-circle me-2"></i>Ürün Detayı
+                </h4>
+                <span class="badge bg-light text-dark">ID: @Model.Id</span>
+            </div>
+            <div class="card-body">
+                <div class="row g-0">
+                    <div class="col-md-4 text-center p-3 bg-light d-flex align-items-center justify-content-center">
+                        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                        {
+                            <img src="@Model.ImageUrl" alt="@Model.Name" class="img-fluid rounded shadow-sm" style="max-height: 300px;" />
+                        }
+                        else
+                        {
+                            <div class="text-muted">
+                                <i class="bi bi-image display-1"></i>
+                                <p>Görsel Yok</p>
+                            </div>
+                        }
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h2 class="card-title fw-bold">@Html.DisplayFor(model => model.Name)</h2>
+                            <div class="mb-3">
+                                @if (Model.OldPrice.HasValue && Model.OldPrice > Model.Price)
+                                {
+                                    <span class="text-muted text-decoration-line-through fs-5 me-2">@Model.OldPrice ₺</span>
+                                    <span class="text-danger fw-bold fs-3">@Model.Price ₺</span>
+                                    <span class="badge bg-danger ms-2">% @(Math.Round(100 - (Model.Price / Model.OldPrice.Value * 100))) İndirim</span>
+                                }
+                                else
+                                {
+                                    <span class="card-text text-success fs-3 fw-bold">@Model.Price ₺</span>
+                                }
+                            </div>
+                            
+                            <div class="mb-3">
+                                @if(Model.Stock <= 0) {
+                                    <span class="badge bg-danger">Tükendi</span>
+                                } else if (Model.Stock <= 5) {
+                                    <span class="badge bg-warning text-dark">Son @Model.Stock Ürün! Hemen Al</span>
+                                } else {
+                                    <span class="badge bg-success">Stokta Var</span>
+                                }
+                            </div>
+                            <p class="card-text text-white">@Html.DisplayFor(model => model.Description)</p>
+                            <p class="card-text"><small class="text-muted">Eklenme Tarihi: @Model.CreatedDate.ToString("dd MMMM yyyy")</small></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-white text-end py-3">
+                <a asp-action="Index" class="btn btn-light me-2">Geri Dön</a>
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-warning text-white px-4">
+                        <i class="bi bi-pencil me-1"></i>Düzenle
+                    </a>
+                }
+                else
+                {
+                    if (Model.Stock > 0)
+                    {
+                        <a asp-controller="Cart" asp-action="AddToCart" asp-route-id="@Model.Id" class="btn btn-warning text-white px-4">
+                            <i class="bi bi-cart-plus me-1"></i>Sepete Ekle
+                        </a>
+                    }
+                    else
+                    {
+                        <button class="btn btn-secondary px-4" disabled>
+                            <i class="bi bi-x-circle me-1"></i>Tükendi
+                        </button>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (ViewBag.SimilarProducts != null && ((List<UrunYonetimSistemi.Models.Product>)ViewBag.SimilarProducts).Count > 0)
+{
+    <div class="row mt-5">
+        <div class="col-12">
+            <h3 class="mb-4 text-white border-bottom pb-2">Benzer Ürünler</h3>
+        </div>
+        @foreach (var item in (List<UrunYonetimSistemi.Models.Product>)ViewBag.SimilarProducts)
+        {
+            <div class="col-md-3 mb-4">
+                <div class="card h-100 border-0 shadow-sm product-card glass">
+                     <div class="position-relative overflow-hidden">
+                        @if (item.Stock <= 0)
+                        {
+                            <span class="position-absolute top-0 end-0 bg-secondary text-white badge m-2 shadow-sm" style="z-index: 10;">Tükendi</span>
+                        }
+                        
+                         <a asp-action="Details" asp-route-id="@item.Id">
+                            @if (!string.IsNullOrEmpty(item.ImageUrl))
+                            {
+                                <img src="@item.ImageUrl" class="card-img-top @(item.Stock <= 0 ? "grayscale" : "")" alt="@item.Name" style="height: 200px; object-fit: cover;">
+                            }
+                            else
+                            {
+                                <div class="d-flex align-items-center justify-content-center bg-dark @(item.Stock <= 0 ? "grayscale" : "")" style="height: 200px;">
+                                    <i class="bi bi-image text-muted display-4"></i>
+                                </div>
+                            }
+                        </a>
+                     </div>
+                     <div class="card-body text-center p-2">
+                        <h6 class="card-title fw-bold text-white text-truncate"><a asp-action="Details" asp-route-id="@item.Id" class="text-white text-decoration-none">@item.Name</a></h6>
+                        <span class="text-success fw-bold">@item.Price ₺</span>
+                     </div>
+                </div>
+            </div>
+        }
+    </div>
+}

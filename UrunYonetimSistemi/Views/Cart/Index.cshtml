@@ -1,0 +1,115 @@
+@model List<UrunYonetimSistemi.Models.CartItem>
+
+@{
+    ViewData["Title"] = "Alışveriş Sepeti";
+    decimal grandTotal = Model.Sum(x => x.Total);
+}
+
+<div class="container py-4">
+    <h1 class="display-6 fw-bold text-white mb-4"><i class="bi bi-cart3 me-3"></i>Alışveriş Sepeti</h1>
+
+    @if (Model.Count == 0)
+    {
+        <div class="alert glass text-center py-5">
+            <i class="bi bi-cart-x display-1 text-muted mb-3"></i>
+            <h3 class="text-white">Sepetinizde ürün bulunmamaktadır.</h3>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-primary mt-3">Alışverişe Başla</a>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card glass shadow-lg border-0 mb-4">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead style="background: rgba(255,255,255,0.05);">
+                                    <tr>
+                                        <th class="ps-4">Ürün</th>
+                                        <th>Fiyat</th>
+                                        <th>Adet</th>
+                                        <th>Toplam</th>
+                                        <th class="text-end pe-4">İşlem</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td class="ps-4">
+                                                <div class="d-flex align-items-center">
+                                                    @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                                    {
+                                                        <img src="@item.ImageUrl" alt="@item.ProductName" class="rounded me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="rounded me-3 bg-secondary d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                                            <i class="bi bi-image"></i>
+                                                        </div>
+                                                    }
+                                                    <span class="fw-bold text-white">@item.ProductName</span>
+                                                </div>
+                                            </td>
+                                            <td>@item.Price.ToString("C2")</td>
+                                            <td>
+                                                <div class="input-group input-group-sm" style="width: 120px;">
+                                                    <a asp-action="DecreaseQuantity" asp-route-id="@item.ProductId" class="btn btn-outline-light border-secondary">
+                                                        <i class="bi bi-dash"></i>
+                                                    </a>
+                                                    <input type="text" class="form-control text-center bg-transparent text-white border-secondary" value="@item.Quantity" readonly>
+                                                    <a asp-action="AddToCart" asp-route-id="@item.ProductId" class="btn btn-outline-light border-secondary">
+                                                        <i class="bi bi-plus"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                            <td class="fw-bold text-success">@item.Total.ToString("C2")</td>
+                                            <td class="text-end pe-4">
+                                                <a asp-action="RemoveFromCart" asp-route-id="@item.ProductId" class="btn btn-sm btn-outline-danger">
+                                                    <i class="bi bi-trash"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="card glass shadow-lg border-0">
+                    <div class="card-body p-4">
+                        <h4 class="card-title mb-4">Sipariş Özeti</h4>
+                        <div class="d-flex justify-content-between mb-3 text-light opacity-75">
+                            <span>Ara Toplam:</span>
+                            <span>@grandTotal.ToString("C2")</span>
+                        </div>
+                        <hr class="border-secondary my-3">
+                        <div class="d-flex justify-content-between mb-4">
+                            <span class="fs-4 fw-bold text-white">Genel Toplam:</span>
+                            <span class="fs-4 fw-bold text-success">@grandTotal.ToString("C2")</span>
+                        </div>
+
+                        @{
+                            // WhatsApp Sipariş Mesajı Oluşturma
+                            var message = "Merhaba, sipariş vermek istiyorum:%0A";
+                            foreach (var item in Model)
+                            {
+                                message += $"- {item.ProductName} ({item.Quantity} Adet) - {item.Total} TL%0A";
+                            }
+                            message += $"%0AToplam Tutar: {grandTotal} TL";
+                        }
+
+                        <a href="https://wa.me/905416542190?text=@message" target="_blank" class="btn btn-success w-100 py-3 fw-bold shadow-lg mb-2">
+                            <i class="bi bi-whatsapp me-2"></i> WhatsApp ile Siparişi Tamamla
+                        </a>
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-light w-100">Alışverişe Devam Et</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

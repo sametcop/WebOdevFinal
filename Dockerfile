@@ -1,10 +1,8 @@
-# .NET 9.0 Çalışma Zamanı (Burası 8.0 kalmış, 9.0 olmalı)
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-# .NET 9.0 SDK (Derleme Aracı)
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 COPY ["UrunYonetimSistemi.csproj", "."]

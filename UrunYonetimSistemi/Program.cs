@@ -69,7 +69,6 @@ app.UseSession(); // Session middleware added here
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapStaticAssets();
 
 app.MapControllerRoute(
     name: "default",

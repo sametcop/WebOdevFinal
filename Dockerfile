@@ -1,4 +1,4 @@
-# .NET 9.0 Runtime (Çalışma Zamanı)
+# .NET 9.0 Çalışma Zamanı (Burası 8.0 kalmış, 9.0 olmalı)
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 WORKDIR /app
 EXPOSE 80

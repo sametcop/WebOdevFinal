@@ -1,10 +1,10 @@
-# .NET çalışma zamanı imajını kullan
+# .NET 9.0 Runtime (Çalışma Zamanı)
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 WORKDIR /app
-EXPOSE 8080
-ENV ASPNETCORE_HTTP_PORTS=8080
+EXPOSE 80
+EXPOSE 443
 
-# Derleme imajını kullan
+# .NET 9.0 SDK (Derleme Aracı)
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 COPY ["UrunYonetimSistemi.csproj", "."]

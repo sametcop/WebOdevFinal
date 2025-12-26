@@ -7,9 +7,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+// DÜZELTME 1: SQL Server yerine SQLite yaptık ve AppDbContext ismini kullandık.
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
+    options.UseSqlite("Data Source=app.db"));
 
 builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 {
@@ -28,7 +28,6 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/Account/AccessDenied";
 });
 
-
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
@@ -36,21 +35,28 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-
 var app = builder.Build();
 
-// Veritabanını Seed et
+// DÜZELTME 2 ve 3: Veritabanı oluşturma ve Seed işlemini doğru sıraya koyduk
+// Tek bir blok içinde hallettik.
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
+        // Önce Context'i doğru isimle çağırıyoruz (Models.AppDbContext)
+        var context = services.GetRequiredService<UrunYonetimSistemi.Models.AppDbContext>();
+        
+        // 1. Adım: Veritabanını oluştur (Yoksa yaratır)
+        context.Database.EnsureCreated(); 
+
+        // 2. Adım: İçine verileri (Admin vb.) ekle
         await UrunYonetimSistemi.Data.DbSeeder.SeedRolesAndAdminAsync(services);
     }
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Veritabanı seed edilirken bir hata oluştu.");
+        logger.LogError(ex, "Veritabanı oluşturulurken veya seed edilirken hata oluştu.");
     }
 }
 
@@ -58,38 +64,20 @@ using (var scope = app.Services.CreateScope())
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-// --- BAŞLANGIÇ: Otomatik Veritabanı Oluşturma Kodu ---
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    try
-    {
-        var context = services.GetRequiredService<UrunYonetimSistemi.Data.ApplicationDbContext>();
-        // Eğer DbContext ismin farklıysa yukarıyı düzelt (Örn: AppDbContext)
-        context.Database.EnsureCreated(); 
-    }
-    catch (Exception ex)
-    {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Veritabanı oluşturulurken hata çıktı.");
-    }
-}
-// --- BİTİŞ ---
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
 app.UseRouting();
-app.UseSession(); // Session middleware added here
+
+app.UseSession(); 
 app.UseAuthentication();
 app.UseAuthorization();
-
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-
 
 app.Run();

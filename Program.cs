@@ -7,9 +7,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddDbContext<AppDbContext>(options =>
- options.UseSqlite("Data Source=app.db");
-
+builder.Services.AddDbContext<UrunYonetimSistemi.Models.AppDbContext>(options => 
+    options.UseSqlite("Data Source=app.db"));
 
 builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 {
@@ -45,6 +44,9 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     try
     {
+     // Veritabanı dosyasını yoksa oluşturur
+        var context = services.GetRequiredService<UrunYonetimSistemi.Models.AppDbContext>();
+        context.Database.EnsureCreated();
         await UrunYonetimSistemi.Data.DbSeeder.SeedRolesAndAdminAsync(services);
     }
     catch (Exception ex)
@@ -78,4 +80,5 @@ app.MapControllerRoute(
 
 
 app.Run();
+
 
